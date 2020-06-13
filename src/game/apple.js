@@ -18,7 +18,7 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
         >
             <radialGradient id={`gradient${key}`}>
                 <stop offset="0%" stopColor="#ffffff" />
-                <stop offset="30%" stopColor="#ffffff" />
+                <stop offset="32%" stopColor="#ffffff" />
                 <stop offset="34%" stopColor="#bbbbbb" />
                 <stop offset="82%" stopColor="#222222" />
                 <stop offset="98%" stopColor="#000000" />
@@ -92,7 +92,7 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
             element._key = key
             gradient = Array.from(element.childNodes[0].children)
                 .slice(1, -1)
-                .map(node => node.attributes.offset)
+                .map((node) => node.attributes.offset)
 
             ref && ref(apple)
             updateSvgElement()
@@ -188,6 +188,6 @@ export function getApple() {
 }
 
 //Put apples in the game
-handle("initialize", function({ game }) {
+handle("initialize", function ({ game }) {
     game.push(apples.elements)
 })
