@@ -1,0 +1,10 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+  background: white;
+}
+
+.ontop {
+  z-index: 1000;
+  position: absolute;
+}
