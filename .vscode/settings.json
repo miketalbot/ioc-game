@@ -1,5 +1,6 @@
 {
     "vetur.format.options.tabSize": 4,
     "editor.highlightActiveIndentGuide": false,
-    "editor.renderIndentGuides": false
+    "editor.renderIndentGuides": false,
+    "editor.fontFamily": "\"Operator Mono\", Menlo, Monaco, 'Courier New', monospace"
 }

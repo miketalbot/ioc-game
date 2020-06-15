@@ -1,10 +1,12 @@
 import React from "react"
 import { update } from "js-coroutines"
-import apple1 from "../assets/apple1.png"
-import apple2 from "../assets/apple2.png"
-import { clamp, interpolate } from "../lib/math"
-import { raise, handle } from "../lib/event-bus"
-import { Pool } from "../lib/pool"
+import apple1 from "../../assets/apple1.png"
+import apple2 from "../../assets/apple2.png"
+import { clamp, interpolate } from "../../lib/math"
+import { raise, handle } from "../../lib/event-bus"
+import { Pool } from "../../lib/pool"
+
+export { apple1, apple2 }
 
 let id = 0
 const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {

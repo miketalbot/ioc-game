@@ -1,9 +1,17 @@
 import React from "react"
-import { update, run } from "js-coroutines"
+import { update } from "js-coroutines"
 import bubble from "../assets/bubble.png"
 import { clamp, interpolate } from "../lib/math"
-import { raise, handle, using } from "../lib/event-bus"
+import { raise, handle, using, plug, useEvent } from "../lib/event-bus"
 import { Pool } from "../lib/pool"
+import {
+    Card,
+    CardMedia,
+    CardContent,
+    CardHeader,
+    Avatar,
+    Badge
+} from "@material-ui/core"
 
 let id = 0
 const Bubble = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
@@ -92,8 +100,9 @@ const Bubble = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
                 element.setAttribute("opacity", _opacity)
                 element.setAttribute(
                     "transform",
-                    `translate(${x},${y}) scale(${_scale * scaleX} ${_scale *
-                        scaleY})`
+                    `translate(${x},${y}) scale(${_scale * scaleX} ${
+                        _scale * scaleY
+                    })`
                 )
             }
         }
@@ -120,11 +129,11 @@ export function makeBubble(x, y, scale) {
 }
 
 //Put apples in the game
-handle("initialize", function({ top }) {
+handle("initialize", function ({ top }) {
     top.push(bubbles.elements)
 })
 
-handle("bob", function(bottle) {
+handle("bob", function (bottle) {
     if (bottle.x < 10 || bottle.x > 990) return
     for (let i = 0; i < Math.random() * 3; i++) {
         makeBubble(
@@ -138,9 +147,9 @@ handle("bob", function(bottle) {
 const EFFECTIVE_DISTANCE = 130
 
 function* moveBubble(bubble) {
-    return yield* using(function*(on) {
+    return yield* using(function* (on) {
         on("player", updatePlayerPosition)
-        on("endGame", () => (stop = true))
+        on("endLevel", () => (stop = true))
         let distanceToCursor = Infinity
         let stop = false
         let bx = bubble.x
@@ -219,4 +228,44 @@ function* moveBubble(bubble) {
             y = ny
         }
     })
+}
+
+plug("mission-item", ({ step }) => step && step.bubbles, BubbleItem)
+
+function BubbleItem({ step, index }) {
+    return (
+        <Card variant="outlined">
+            <CardHeader subheader={` `} />
+            <CardMedia style={{ paddingTop: "56%" }} image={bubble} />
+            <CardContent>Pop {step.bubbles} bubbles</CardContent>
+        </Card>
+    )
+}
+
+plug(
+    "mission-indicator",
+    ({ item }) => item.bubbles !== undefined,
+    BubbleIndicator
+)
+
+function BubbleIndicator({ item, isCurrent, next, update }) {
+    useEvent("popped", handlePopped)
+    return (
+        <Badge
+            color="secondary"
+            invisible={!isCurrent}
+            badgeContent={item.bubbles}
+        >
+            <Avatar src={bubble} />
+        </Badge>
+    )
+    function handlePopped() {
+        if (isCurrent) {
+            item.bubbles--
+            update(Date.now())
+            if (item.bubbles <= 0) {
+                next()
+            }
+        }
+    }
 }

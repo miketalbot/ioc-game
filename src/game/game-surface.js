@@ -2,22 +2,22 @@ import React from "react"
 import { update } from "js-coroutines"
 import { Box } from "@material-ui/core"
 import { RiverBank } from "./riverbank"
-import { raise, using } from "../lib/event-bus"
+import { raise, using, useEvent } from "../lib/event-bus"
 
 function sortByExtraction(fn) {
-    return function(a, b) {
+    return function (a, b) {
         const va = fn(a)
         const vb = fn(b)
         return vb > va ? -1 : va === vb ? 0 : 1
     }
 }
 
-const inPriorityOrder = sortByExtraction(v => v.priority || 0)
+const inPriorityOrder = sortByExtraction((v) => v.priority || 0)
 
 function* standardPlayer(getPosition, playing) {
-    yield* using(function*(on) {
-        on("startGame", () => (playing = true))
-        on("endGame", () => (playing = false))
+    yield* using(function* (on) {
+        on("startLevel", () => (playing = true))
+        on("endLevel", () => (playing = false))
         let lx = undefined
         let ly = undefined
         while (true) {
@@ -41,6 +41,8 @@ function* standardPlayer(getPosition, playing) {
 }
 
 export function GameSurface({ children }) {
+    const [windowWidth, setWidth] = React.useState(window.innerWidth)
+    const playing = React.useRef(false)
     const ref = React.useRef()
     const [elements] = React.useState(() => {
         const [elements] = raise("initialize", { game: [], top: [] })
@@ -48,17 +50,33 @@ export function GameSurface({ children }) {
         elements.top.sort(inPriorityOrder)
         return elements
     })
+    React.useEffect(() => {
+        window.addEventListener("resize", updateWidth)
+        return () => {
+            window.removeEventListener("resize", updateWidth)
+        }
+        function updateWidth() {
+            setWidth(window.innerWidth)
+        }
+    }, [])
+    useEvent("startLevel", () => (playing.current = true))
+    useEvent("endLevel", () => (playing.current = false))
+
+    let ratio = 1000 / windowWidth
+    let height = Math.min(window.innerHeight, 700 / ratio)
+    let width = (height / 700) * 1000
+    let offset = (windowWidth - width) / 2
     let x = 0
     let y = 0
     let lastTime = Date.now()
     React.useEffect(() => {
-        return update(standardPlayer(getPosition)).terminate
+        return update(standardPlayer(getPosition, playing.current)).terminate
     })
     return (
         <Box position="relative">
             <svg
                 viewBox="0 0 1000 700"
-                width="100%"
+                width={width}
                 style={{ background: "lightblue", position: "relative" }}
             >
                 <RiverBank>{elements.game}</RiverBank>
@@ -66,9 +84,11 @@ export function GameSurface({ children }) {
             </svg>
             <Box
                 ref={ref}
+                onTouchStart={startTouch}
                 onTouchMove={captureTouch}
                 onMouseMove={captureMouse}
                 position="absolute"
+                style={{ zoom: 1 / ratio }}
                 left={0}
                 top={0}
                 right={0}
@@ -80,18 +100,24 @@ export function GameSurface({ children }) {
     )
 
     function captureTouch(event) {
+        event.stopPropagation()
+        event.preventDefault()
         lastTime = Date.now()
-        const p = ref.current.offsetWidth / 1000
         const rect = ref.current.getBoundingClientRect()
-        x = (event.targetTouches[0].clientX - rect.left) / p
+        const p = width / 1000
+        x = (event.targetTouches[0].clientX - rect.left - offset) / p
         y = (event.targetTouches[0].clientY - rect.top) / p
+    }
+
+    function startTouch() {
+        lastTime = 0
     }
 
     function captureMouse(event) {
         lastTime = Date.now()
-        const p = ref.current.offsetWidth / 1000
+        const p = width / 1000
         const rect = ref.current.getBoundingClientRect()
-        x = (event.clientX - rect.left) / p
+        x = (event.clientX - rect.left - offset) / p
         y = (event.clientY - rect.top) / p
     }
 

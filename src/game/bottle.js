@@ -1,8 +1,8 @@
 import React from "react"
-import { update, run } from "js-coroutines"
+import { update } from "js-coroutines"
 import bottle from "../assets/bottle.png"
 import { clamp, interpolate } from "../lib/math"
-import { raise, handle } from "../lib/event-bus"
+import { raise, handle, using, ensureArray } from "../lib/event-bus"
 import { Pool } from "../lib/pool"
 
 let id = 0
@@ -63,7 +63,7 @@ const Bottle = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
                 angle += (60 / 1000) * speed
                 bobDepth = Math.sin(angle) + 1
                 let sign = Math.sign(bobDepth - 1)
-                if (sign !== lastSign) {
+                if (sign !== lastSign && visible) {
                     raise("bob", bottle)
                 }
                 lastSign = sign
@@ -116,49 +116,44 @@ const Bottle = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
     }
 })
 
-const bottles = new Pool(Bottle, 3)
+const bottles = new Pool(Bottle, 5)
 
 export function getBottle() {
     return bottles.get()
 }
 
 //Put apples in the game
-handle("initialize", function({ game }) {
+handle("initialize", function ({ game }) {
     game.push(bottles.elements)
 })
 
-let currentProcessor = null
-
-handle("endGame", function() {
-    if (currentProcessor) {
-        currentProcessor.terminate()
-        currentProcessor = null
-    }
-})
-
-handle("startGame", async function() {
-    currentProcessor = run(allocateBottles())
-})
-
-function* moveBottle(bottle) {
-    for (let x = bottle.x; x > -500; x -= 0.5) {
-        bottle.move(x, bottle.y)
-        yield
-    }
-    bottle.return()
-}
-
-function* allocateBottles() {
-    while (true) {
-        yield new Promise(resolve =>
-            setTimeout(resolve, 17000 + Math.random() * 15000)
-        )
-        let bottle = getBottle()
-        if (bottle) {
-            bottle.move(1000, Math.random() * 400 + 150)
-            bottle.show(true)
-            update(moveBottle(bottle))
+function* moveBottle(bottle, speed) {
+    yield* using(function* (on) {
+        let stop = false
+        on("endLevel", () => (stop = true))
+        for (let x = bottle.x; !stop && x > -500; x -= speed) {
+            bottle.move(x, bottle.y)
+            yield
         }
-        yield true
+        bottle.return()
+    })
+}
+
+export function driftBottle(
+    x = 1020,
+    y = Math.random() * 400 + 200,
+    speed = 0.5
+) {
+    let bottle = getBottle()
+    if (bottle) {
+        bottle.move(x, y)
+        bottle.show(true)
+        update(moveBottle(bottle, speed))
     }
 }
+
+handle("prepareLevel", ({ bottleFixed }) => {
+    for (let fixed of ensureArray(bottleFixed)) {
+        driftBottle(fixed.x, fixed.y, fixed.speed)
+    }
+})

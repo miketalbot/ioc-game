@@ -1,25 +1,30 @@
 import { using, handle, raise } from "../lib/event-bus"
-import { getApple } from "./apple"
+import { getApple } from "./apple/apple"
 import { update } from "js-coroutines"
 import { interpolate, clamp, Vector, getVector, ease } from "../lib/math"
-import { floatText, cascadeText } from "./floating-text"
+import { floatText } from "./floating-text"
 import { makeTopmost } from "./topmost"
 
-let usedApples = []
-
-handle("startGame", function() {
-    for (let i = 0; i < 20; i++) {
+handle("prepareLevel", function ({ redApples = 0, greenApples = 0 }) {
+    for (let i = 0; i < redApples; i++) {
+        let apple = getApple()
+        apple.setDepth(2)
+        apple.color("red")
+        apple.move(Math.random() * 800 + 100, Math.random() * 440 + 200)
+        apple.show(true)
+        update(moveApple(apple))
+    }
+    for (let i = 0; i < greenApples; i++) {
         let apple = getApple()
         apple.setDepth(2)
         apple.color("green")
         apple.move(Math.random() * 800 + 100, Math.random() * 440 + 200)
         apple.show(true)
-        const coroutine = update(moveApple(apple))
-        usedApples.push({ apple, coroutine })
+        update(moveApple(apple))
     }
 })
 
-handle("popped", function(bubble) {
+handle("popped", function (bubble) {
     raise("score", { score: 50, x: bubble.x, y: bubble.y })
     floatText(bubble.x, bubble.y, "+ 50", "gold", 2.5, 1.7)
 })
@@ -30,9 +35,10 @@ function* moveApple(apple) {
     let v = new Vector()
     const playerRangeSq = (apple.radius * 1.8) ** 2
     let coreDepth = 2
-    yield* using(function*(on) {
+    yield* using(function* (on) {
         on("circle", checkCollision)
         on("player", checkPlayer)
+        on("endLevel", () => (mode = "cancel"))
         //Let the apple rotate
         apple.rotate(true)
 
@@ -44,7 +50,7 @@ function* moveApple(apple) {
             coreDepth = coreDepth > 0 ? coreDepth - 0.02 : 0
             coreDepth = Math.max(
                 0,
-                Math.min(2, coreDepth + Math.min(0.035, v.length() / 24))
+                Math.min(2, coreDepth + Math.min(0.032, v.length() / 32))
             )
             apple.setDepth(coreDepth)
             yield
@@ -83,22 +89,27 @@ function* moveApple(apple) {
             }
 
             top.return()
-        } else {
+        } else if (mode !== "cancel") {
             raise("lost", apple)
         }
-
         apple.return()
 
         function checkPlayer({ x, y, dx, dy, distance }) {
-            const toPlayer = getVector(x, y).sub(Vector.from(apple))
-            const toPlayerDistanceSq = toPlayer.lengthSq()
-            const playerMotion = getVector(dx, dy).scale(1 / 30)
+            let t = clamp(
+                ((apple.x - x) * dx + (apple.y - y) * dy) / distance ** 2
+            )
+            let toPlayerDistanceSq =
+                (apple.x - x + t * dx) ** 2 + (apple.y - y + t * dy) ** 2
+
+            // const toPlayer = getVector(x, y).sub(Vector.from(apple))
+            // const toPlayerDistanceSq = toPlayer.lengthSq()
+            const playerMotion = getVector(dx, dy).scale(1 / 20)
             const angle = Vector.from(apple)
                 .sub(getVector(x, y))
                 .angleBetween(playerMotion)
             if (
                 toPlayerDistanceSq < playerRangeSq &&
-                Math.abs(angle) < Math.PI / 4
+                Math.abs(angle) < Math.PI / 3
             ) {
                 apple.addRotation((-angle * distance) / 15)
                 v.add(playerMotion)

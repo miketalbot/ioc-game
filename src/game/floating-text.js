@@ -74,8 +74,8 @@ const Text = React.forwardRef(function Text(props, ref) {
 
 const texts = new Pool(Text, 50)
 
-handle("initialize", function({ game, top }) {
-    texts.elements.priority = -1
+handle("initialize", function ({ game, top }) {
+    texts.elements.priority = 20
     top.push(texts.elements)
 })
 
