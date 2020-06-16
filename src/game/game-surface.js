@@ -62,7 +62,7 @@ export function GameSurface({ children }) {
     useEvent("startLevel", () => (playing.current = true))
     useEvent("endLevel", () => (playing.current = false))
 
-    let ratio = 1000 / windowWidth
+    let ratio = Math.max(1, 1000 / windowWidth)
     let height = Math.min(window.innerHeight, 700 / ratio)
     let width = (height / 700) * 1000
     let offset = (windowWidth - width) / 2
@@ -73,7 +73,15 @@ export function GameSurface({ children }) {
         return update(standardPlayer(getPosition, playing.current)).terminate
     })
     return (
-        <Box position="relative">
+        <Box
+            ref={ref}
+            onTouchStart={startTouch}
+            onTouchMove={captureTouch}
+            onMouseMove={captureMouse}
+            position="relative"
+            width={width}
+            style={{ marginLeft: offset }}
+        >
             <svg
                 viewBox="0 0 1000 700"
                 width={width}
@@ -83,10 +91,6 @@ export function GameSurface({ children }) {
                 {elements.top}
             </svg>
             <Box
-                ref={ref}
-                onTouchStart={startTouch}
-                onTouchMove={captureTouch}
-                onMouseMove={captureMouse}
                 position="absolute"
                 style={{ zoom: 1 / ratio }}
                 left={0}
@@ -105,7 +109,7 @@ export function GameSurface({ children }) {
         lastTime = Date.now()
         const rect = ref.current.getBoundingClientRect()
         const p = width / 1000
-        x = (event.targetTouches[0].clientX - rect.left - offset) / p
+        x = (event.targetTouches[0].clientX - rect.left) / p
         y = (event.targetTouches[0].clientY - rect.top) / p
     }
 
@@ -117,7 +121,8 @@ export function GameSurface({ children }) {
         lastTime = Date.now()
         const p = width / 1000
         const rect = ref.current.getBoundingClientRect()
-        x = (event.clientX - rect.left - offset) / p
+
+        x = (event.clientX - rect.left) / p
         y = (event.clientY - rect.top) / p
     }
 

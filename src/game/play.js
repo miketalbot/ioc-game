@@ -26,7 +26,6 @@ handle("prepareLevel", function ({ redApples = 0, greenApples = 0 }) {
 
 handle("popped", function (bubble) {
     raise("score", { score: 50, x: bubble.x, y: bubble.y })
-    floatText(bubble.x, bubble.y, "+ 50", "gold", 2.5, 1.7)
 })
 
 function* moveApple(apple) {
@@ -50,7 +49,7 @@ function* moveApple(apple) {
             coreDepth = coreDepth > 0 ? coreDepth - 0.02 : 0
             coreDepth = Math.max(
                 0,
-                Math.min(2, coreDepth + Math.min(0.032, v.length() / 32))
+                Math.min(2, coreDepth + Math.min(0.027, v.length() / 34))
             )
             apple.setDepth(coreDepth)
             yield
@@ -121,9 +120,9 @@ function* moveApple(apple) {
             const toApple = Vector.from(other).sub(Vector.from(apple).add(v))
             let totalRadius = (apple.radius + other.radius) * 0.8
             let distance = toApple.length()
-            if (distance < 1.12 * totalRadius) {
+            if (distance < 1.1 * totalRadius) {
                 const scale =
-                    interpolate(-1, 0, clamp(distance / totalRadius - 0.6)) / 17
+                    interpolate(-1, 0, clamp(distance / totalRadius - 0.6)) / 8
                 v.add(toApple.normalize().scale(scale * (other.power || 1)))
             }
         }

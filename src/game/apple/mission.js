@@ -38,7 +38,6 @@ function BonusIndicator({ isCurrent }) {
             scale: 4
         })
         raise("score", { score: 1500, x: apple.x, y: apple.y })
-        floatText(apple.x, apple.y, "+ 1500", "gold", 3.5, 2)
     }
 }
 
@@ -67,7 +66,6 @@ function RedIndicator({ item, isCurrent, next, update }) {
                 next()
             }
             raise("score", { score: 2500, x: apple.x, y: apple.y })
-            floatText(apple.x, apple.y, "+ 2500", "gold", 3.5, 2)
         } else {
             raise("error")
             cascadeText({
@@ -113,7 +111,6 @@ function GreenIndicator({ item, isCurrent, next, update }) {
                 scale: 4
             })
             raise("score", { score: 2500, x: apple.x, y: apple.y })
-            floatText(apple.x, apple.y, "+ 2500", "gold", 3.5, 2)
         } else {
             raise("error")
             cascadeText({
@@ -137,11 +134,11 @@ function RedItem({ step, index }) {
         <Card variant="outlined">
             <CardHeader subheader={` `} />
             <CardMedia
-                style={{ paddingTop: 80, backgroundSize: "contain" }}
+                style={{ paddingTop: 60, backgroundSize: "contain" }}
                 image={apple1}
             />
             <CardContent>
-                Collect {step.red} red apple{step.red !== 1 ? "s" : ""}
+                {step.red} red apple{step.red !== 1 ? "s" : ""}
             </CardContent>
         </Card>
     )
@@ -154,11 +151,11 @@ function GreenItem({ step, index }) {
         <Card variant="outlined">
             <CardHeader subheader={` `} />
             <CardMedia
-                style={{ paddingTop: 80, backgroundSize: "contain" }}
+                style={{ paddingTop: 60, backgroundSize: "contain" }}
                 image={apple2}
             />
             <CardContent>
-                Collect {step.green} green apple{step.green !== 1 ? "s" : ""}
+                {step.green} green apple{step.green !== 1 ? "s" : ""}
             </CardContent>
         </Card>
     )

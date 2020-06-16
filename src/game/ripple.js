@@ -40,6 +40,10 @@ const Ripple = React.forwardRef(function Ripple(props, ref) {
                 shownOpacity = !!value ? 1 : 0
             },
             update() {
+                value.setAttribute(
+                    "display",
+                    shownOpacity * _opacity > 0 ? "block" : "none"
+                )
                 value.setAttribute("opacity", shownOpacity * _opacity)
                 value.setAttribute(
                     "transform",
@@ -56,12 +60,12 @@ const Ripple = React.forwardRef(function Ripple(props, ref) {
 const ripples = new Pool(Ripple, 25)
 let lastTime = 0
 
-handle("initialize", function({ game }) {
+handle("initialize", function ({ game }) {
     ripples.elements.priority = -1
     game.push(ripples.elements)
 })
 
-handle("player", function({ x, y, distance }) {
+handle("player", function ({ x, y, distance }) {
     if (Date.now() - lastTime < 100 && distance < 10) return
     lastTime = Date.now()
     if (distance > 2 && distance < 100) {

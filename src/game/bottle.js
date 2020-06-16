@@ -81,10 +81,10 @@ const Bottle = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
                     power: 1.4
                 }
                 raise("circle", location)
-                for (let x = 150; x < 400; x += 100) {
+                for (let x = 150; x < 370; x += 60) {
                     location.x = bottle.x + x
                     location.y = bottle.y
-                    location.radius = 90
+                    location.radius = 85
                     raise("circle", location)
                 }
             }

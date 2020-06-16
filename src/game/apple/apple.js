@@ -126,8 +126,9 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
             )
             if (_rotate) rotation += rotationSpeed
             if (!visible) {
-                element.setAttribute("transform", `translate(-100000,-100000)`)
+                element.setAttribute("display", "none")
             } else {
+                element.setAttribute("display", "block")
                 element.setAttribute(
                     "transform",
                     `translate(${x},${y}) scale(${(scale = interpolate(
@@ -183,7 +184,7 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
     }
 })
 
-const apples = new Pool(Apple, 20)
+const apples = new Pool(Apple, 30)
 
 export function getApple() {
     return apples.get()

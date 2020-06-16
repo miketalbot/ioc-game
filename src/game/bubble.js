@@ -94,9 +94,12 @@ const Bubble = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
             if (!visible) {
                 if (setInvisible) return
                 setInvisible = true
-                element.setAttribute("transform", `translate(-100000,-100000)`)
+                element.setAttribute("display", "none")
             } else {
-                setInvisible = false
+                if (setInvisible) {
+                    element.setAttribute("display", "block")
+                    setInvisible = false
+                }
                 element.setAttribute("opacity", _opacity)
                 element.setAttribute(
                     "transform",
@@ -139,7 +142,7 @@ handle("bob", function (bottle) {
         makeBubble(
             bottle.x + 20 + Math.random() * 5,
             bottle.y - 40 + Math.random() * 50,
-            0.2 + Math.random() * 0.4
+            0.1 + Math.random() * 0.2
         )
     }
 })
@@ -180,7 +183,7 @@ function* moveBubble(bubble) {
             distanceFromStart = Math.sqrt((bx - ox) ** 2 + (by - oy) ** 2)
             bubble.scale(
                 clamp(scaleMultipler) *
-                    (size + (size * 3 * distanceFromStart) / EFFECTIVE_DISTANCE)
+                    (size + (size * 2 * distanceFromStart) / EFFECTIVE_DISTANCE)
             )
 
             if (distanceToCursor < EFFECTIVE_DISTANCE) {
@@ -236,7 +239,10 @@ function BubbleItem({ step, index }) {
     return (
         <Card variant="outlined">
             <CardHeader subheader={` `} />
-            <CardMedia style={{ paddingTop: "56%" }} image={bubble} />
+            <CardMedia
+                style={{ paddingTop: 60, backgroundSize: "contain" }}
+                image={bubble}
+            />
             <CardContent>Pop {step.bubbles} bubbles</CardContent>
         </Card>
     )

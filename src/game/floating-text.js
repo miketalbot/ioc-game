@@ -59,6 +59,10 @@ const Text = React.forwardRef(function Text(props, ref) {
                 shownOpacity = !!value ? 1 : 0
             },
             update() {
+                value.setAttribute(
+                    "display",
+                    shownOpacity * _opacity > 0 ? "block" : "none"
+                )
                 value.setAttribute("opacity", shownOpacity * _opacity)
                 value.setAttribute(
                     "transform",
