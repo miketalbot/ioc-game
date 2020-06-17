@@ -1,17 +1,14 @@
 import React from "react"
 import { Box, Typography } from "@material-ui/core"
-import { handle, raise } from "../lib/event-bus"
-import seedRandom from "seedrandom"
-Math.random = seedRandom("Hello")
 
-const configuredLevels = [
+export const configuredLevels = [
     {
         instructions: (
             <Box>
                 <Typography gutterBottom>
                     Let's get going with something simple. Just pop the bubbles
                 </Typography>
-                <Typography gutterBottom>
+                <Typography variant={"body2"} gutterBottom>
                     No need to click with a mouse so just use your pointer or
                     your finger to hit the centre of the bubbles.
                 </Typography>
@@ -42,13 +39,21 @@ const configuredLevels = [
     {
         instructions: (
             <Box>
-                <Typography gutterBottom>
+                <Typography gutterBottom variant={"body2"}>
                     Collect the apples in the right order. You will lose a life
                     if you get them out of sequence.
                 </Typography>
                 <Typography gutterBottom>
                     Push the apples to the top bank in sequence. There is no
                     need to click with your mouse.
+                </Typography>
+                <Typography gutterBottom>
+                    <strong>
+                        <em>
+                            The harder you push an apple the more it sinks.
+                            Underwater apples are hard to move!
+                        </em>
+                    </strong>
                 </Typography>
             </Box>
         ),
@@ -109,73 +114,3 @@ const configuredLevels = [
         mission: [{ green: 3 }, { red: 1 }, { green: 3 }, { red: 1 }]
     }
 ]
-
-let currentLevel = 0
-
-handle("startGame", () => {
-    Math.random = seedRandom("Hello")
-    currentLevel = 0
-})
-
-handle("newLevel", (levelNumber = currentLevel + 1) => {
-    raise("endLevel")
-    currentLevel = levelNumber
-    if (configuredLevels.length >= levelNumber) {
-        const levelSpec = { ...configuredLevels[currentLevel - 1], levelNumber }
-        raise("levelReady", levelSpec)
-    } else {
-        let green = ((Math.random() * 8) | 0) + 4
-        let red = (Math.random() * 8) | (0 + (10 - green) + 2)
-        const steps = (3 + Math.random() * 3) | 0
-        let levelSpec = {
-            levelNumber,
-            time: Math.min(99, 60 + (((Math.random() * 30) / 5) | 0) * 5),
-            redApples: red,
-            greenApples: green,
-            mission: [],
-            bottleFixed: []
-        }
-
-        let bottles = (2 + Math.random() * 3) | 0
-        let bottleStart = (Math.random() * 1100) | 0
-        for (let i = 0; i < bottles; i++) {
-            levelSpec.bottleFixed.push({
-                x: bottleStart,
-                y: 150 + Math.random() * 500,
-                speed: 0.25 + Math.random() / 9
-            })
-            bottleStart += (500 + Math.random() * 300) | 0
-        }
-        let mission = levelSpec.mission
-        let allocate
-        let last = -1
-        let amount
-        for (let i = 0; i < steps; i++) {
-            let next = (Math.random() * 3) | 0
-            if (next === last) {
-                next = (last + 1) % 3
-            }
-            last = next
-            switch (next) {
-                case 0:
-                    allocate = (Math.random() * 5 + 1) | 0
-                    amount = Math.min(red - 1, allocate)
-                    if (amount < 1) continue
-                    mission.push({ red: amount })
-                    red = red - allocate
-                    break
-                case 1:
-                    allocate = (Math.random() * 5 + 1) | 0
-                    amount = Math.min(green - 1, allocate)
-                    if (amount < 1) continue
-                    mission.push({ green: amount })
-                    green -= allocate
-                    break
-                default:
-                    mission.push({ bubbles: ((Math.random() * 3) | 0) * 5 + 5 })
-                    break
-            }
-        }
-        raise("levelReady", levelSpec)
-    }
-})

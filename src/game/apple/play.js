@@ -1,9 +1,7 @@
-import { using, handle, raise } from "../lib/event-bus"
-import { getApple } from "./apple/apple"
+import { handle, raiseLater, using } from "../../lib/event-bus"
+import { getApple, getTopApple } from "./apple"
 import { update } from "js-coroutines"
-import { interpolate, clamp, Vector, getVector, ease } from "../lib/math"
-import { floatText } from "./floating-text"
-import { makeTopmost } from "./topmost"
+import { clamp, ease, getVector, interpolate, Vector } from "../../lib/math"
 
 handle("prepareLevel", function ({ redApples = 0, greenApples = 0 }) {
     for (let i = 0; i < redApples; i++) {
@@ -25,7 +23,7 @@ handle("prepareLevel", function ({ redApples = 0, greenApples = 0 }) {
 })
 
 handle("popped", function (bubble) {
-    raise("score", { score: 50, x: bubble.x, y: bubble.y })
+    raiseLater("score", { score: 50, x: bubble.x, y: bubble.y })
 })
 
 function* moveApple(apple) {
@@ -64,7 +62,11 @@ function* moveApple(apple) {
         apple.rotate(false)
         if (mode === "collect") {
             apple.setDepth(-1)
-            let top = makeTopmost(apple)
+            let shadow = getTopApple()
+            if(shadow) {
+                shadow.color(apple.color())
+            }
+            yield
             let targetX = clamp(apple.x, 80, 920)
             let initialX = apple.x
             let initialY = apple.y
@@ -76,20 +78,22 @@ function* moveApple(apple) {
                 )
                 apple.setDepth(interpolate(0, -1.3, ease(t)))
                 apple.update()
+                shadow && apple.update(shadow.element)
                 yield
             }
-            raise("collect", apple)
+            raiseLater("collect", apple)
             let now = Date.now()
             while (Date.now() - now < 1000) yield
             for (let t = 0; t < 1; t += 0.03) {
                 apple.move(apple.x, interpolate(40, -100, ease(t)))
                 apple.update()
+                shadow && apple.update(shadow.element)
                 yield
             }
 
-            top.return()
+            shadow && shadow.return()
         } else if (mode !== "cancel") {
-            raise("lost", apple)
+            raiseLater("lost", apple)
         }
         apple.return()
 

@@ -1,8 +1,9 @@
 import React from "react"
 import { update } from "js-coroutines"
 import bottle from "../assets/bottle.png"
+import shadow from "../assets/bottle-shadow.png"
 import { clamp, interpolate } from "../lib/math"
-import { raise, handle, using, ensureArray } from "../lib/event-bus"
+import { raise, handle, using, ensureArray, raiseLater } from "../lib/event-bus"
 import { Pool } from "../lib/pool"
 
 let id = 0
@@ -11,15 +12,12 @@ const Bottle = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
     return (
         <g opacity={1} ref={addRef} id={`bottle${key}`}>
             <image
-                alt="bottle"
-                href={bottle}
+                href={shadow}
                 x={10}
                 y={-90}
-                width={410}
-                filter="url(#duotone)"
-                opacity={0.3}
+                width={400}
             />
-            <image alt="bottle" href={bottle} x={0} y={-100} width={400} />
+            <image href={bottle} x={0} y={-100} width={400} />
         </g>
     )
 
@@ -64,7 +62,7 @@ const Bottle = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
                 bobDepth = Math.sin(angle) + 1
                 let sign = Math.sign(bobDepth - 1)
                 if (sign !== lastSign && visible) {
-                    raise("bob", bottle)
+                    raiseLater("bob", bottle)
                 }
                 lastSign = sign
                 bottle.update()
@@ -92,12 +90,12 @@ const Bottle = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
             if (!visible) {
                 element.setAttribute("transform", `translate(-100000,-100000)`)
             } else {
-                element.children[0].setAttribute("x", 15 - bobDepth * 3)
-                element.children[0].setAttribute("y", -90 - bobDepth * 3)
-                element.children[0].setAttribute("width", 410 - bobDepth * 3)
+                element.children[0].setAttribute("x", (15 - bobDepth * 3))
+                element.children[0].setAttribute("y", (-90 - bobDepth * 3))
+                element.children[0].setAttribute("width", (410 - bobDepth * 3))
                 element.setAttribute(
                     "transform",
-                    `translate(${x},${y}) scale(${interpolate(
+                    `translate(${x |0},${y|0}) scale(${interpolate(
                         1,
                         0.92,
                         clamp(bobDepth / 2)
@@ -116,7 +114,7 @@ const Bottle = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
     }
 })
 
-const bottles = new Pool(Bottle, 5)
+const bottles = new Pool(Bottle, 4)
 
 export function getBottle() {
     return bottles.get()

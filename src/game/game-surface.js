@@ -2,17 +2,8 @@ import React from "react"
 import { update } from "js-coroutines"
 import { Box } from "@material-ui/core"
 import { RiverBank } from "./riverbank"
-import { raise, using, useEvent } from "../lib/event-bus"
-
-function sortByExtraction(fn) {
-    return function (a, b) {
-        const va = fn(a)
-        const vb = fn(b)
-        return vb > va ? -1 : va === vb ? 0 : 1
-    }
-}
-
-const inPriorityOrder = sortByExtraction((v) => v.priority || 0)
+import { raise, useEvent, using } from "../lib/event-bus"
+import { inPriorityOrder } from "../lib/sort"
 
 function* standardPlayer(getPosition, playing) {
     yield* using(function* (on) {

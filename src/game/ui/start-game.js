@@ -1,7 +1,7 @@
 import React from "react"
-import { handle, raise, useEvent } from "../lib/event-bus"
-import { Box, Button } from "@material-ui/core"
-import { CenteredBox } from "../lib/centered"
+import { handle, raise, useEvent } from "../../lib/event-bus"
+import { Button } from "@material-ui/core"
+import { CenteredBox } from "../../lib/centered"
 
 handle("ui", function (elements) {
     elements.push(<StartScreen key="start" />)
@@ -9,6 +9,7 @@ handle("ui", function (elements) {
 
 function StartScreen() {
     const [playing, setPlaying] = React.useState(false)
+    useEvent("startGame", () => setPlaying(true))
     useEvent("endGame", () => setPlaying(false))
     return (
         !playing && (
@@ -26,7 +27,6 @@ function StartScreen() {
     )
 
     function play() {
-        setPlaying(true)
         raise("startGame")
     }
 }

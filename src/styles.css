@@ -3,6 +3,7 @@
     text-align: center;
     background: #333;
     overflow: hidden;
+    cursor: pointer;
 }
 
 body {
@@ -19,6 +20,5 @@ body {
 }
 
 .ontop {
-    z-index: 1000;
     position: absolute;
 }
