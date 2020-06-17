@@ -3,6 +3,7 @@ import "./utilities/ripple"
 import "./apple"
 import "./bottle"
 import "./bubble"
+import "./bubble-ui"
 import "./levels"
 
 import "./ui/score"

@@ -35,7 +35,6 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
                 />
             </mask>
             <image
-                alt="apple"
                 href={Math.random() > 0.5 ? apple1 : apple2}
                 x={-100}
                 y={-100}
@@ -54,7 +53,6 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
         let visible = false
         let naturalRotationSpeed = (Math.random() - 0.5) * 0.07
         let rotationSpeed = naturalRotationSpeed
-        let gradient
         let apple
         let _rotate = false
         let _image = apple1
@@ -63,9 +61,11 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
             apple = Object.defineProperties(
                 {
                     element,
-                    gradient,
                     key,
                     move,
+                    start() {
+                        update(bob(apple))
+                    },
                     setDepth,
                     addRotation,
                     update: updateSvgElement,
@@ -92,13 +92,12 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
                 }
             )
             element._key = key
-            gradient = Array.from(element.childNodes[0].children)
+            element._gradient = Array.from(element.childNodes[0].children)
                 .slice(1, -1)
                 .map((node) => node.attributes.offset)
 
             ref && ref(apple)
             updateSvgElement()
-            update(bob(apple))
         }
 
         function addRotation(amount) {
@@ -116,7 +115,7 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
             }
         }
 
-        function updateSvgElement() {
+        function updateSvgElement(updateElement = element) {
             raise("circle", apple)
             const effectiveDepth = bobDepth + depth
             rotationSpeed = interpolate(
@@ -126,10 +125,10 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
             )
             if (_rotate) rotation += rotationSpeed
             if (!visible) {
-                element.setAttribute("display", "none")
+                updateElement.setAttribute("display", "none")
             } else {
-                element.setAttribute("display", "block")
-                element.setAttribute(
+                updateElement.setAttribute("display", "block")
+                updateElement.setAttribute(
                     "transform",
                     `translate(${x},${y}) scale(${(scale = interpolate(
                         0.5,
@@ -137,22 +136,22 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
                         effectiveDepth
                     ))}) rotate(${rotation})`
                 )
-                gradient[0].value = `${interpolate(
+                updateElement._gradient[0].value = `${interpolate(
                     75,
                     10,
                     clamp(effectiveDepth)
                 )}%`
-                gradient[1].value = `${interpolate(
+                updateElement._gradient[1].value = `${interpolate(
                     80,
                     20,
                     clamp(effectiveDepth)
                 )}%`
-                gradient[2].value = `${interpolate(
+                updateElement._gradient[2].value = `${interpolate(
                     90,
                     75,
                     clamp(effectiveDepth)
                 )}%`
-                element.setAttribute(
+                updateElement.setAttribute(
                     "opacity",
                     interpolate(1, 0, effectiveDepth - 1)
                 )
@@ -185,12 +184,22 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
 })
 
 const apples = new Pool(Apple, 30)
+const topApples = new Pool(Apple, 3)
 
 export function getApple() {
     return apples.get()
 }
 
+export function getTopApple() {
+    return topApples.get()
+}
+
+
 //Put apples in the game
-handle("initialize", function ({ game }) {
+handle("initialize", function ({ game, top  }) {
     game.push(apples.elements)
+    top.push(topApples.elements)
+    setTimeout(()=>{
+        apples.forEach(apple=>apple.start())
+    }, 50)
 })

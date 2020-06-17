@@ -1,38 +1,33 @@
 import React from "react"
-import water from "../assets/waternice.gif"
+import water from "../assets/water.gif"
+import ground from "../assets/ground.png"
+import shadow from "../assets/ground-shadow.png"
+
+const isSafari =
+    navigator.vendor &&
+    navigator.vendor.indexOf("Apple") > -1 &&
+    navigator.userAgent &&
+    navigator.userAgent.indexOf("CriOS") === -1 &&
+    navigator.userAgent.indexOf("FxiOS") === -1
 
 export function RiverBank({ children }) {
     return (
         <g>
-            <filter id="duotone">
-                <feColorMatrix
-                    type="matrix"
-                    values=".02 .02 .22 0 0
-      .02 .02 .11 0 0
-      .11 .11 .11 0 0
-      0   0   0  1 0"
-                />
-            </filter>
+            {!isSafari && (
+                <>
+                    <image href={water} opacity={0.1} x={0} y={0} />
+                    <image href={water} opacity={0.1} x={500} y={0} />
+                    <image href={water} opacity={0.1} x={0} y={500} />
+                    <image href={water} opacity={0.1} x={500} y={500} />
+                </>
+            )}
             {children}
 
-            <g
-                transform={"rotate(180 500 300) translate(-20 320)"}
-
-            >
-                <image
-                    href="https://www.downloadclipart.net/large/ground-png-photos.png"
-                    filter="url(#duotone)"
-                    opacity="0.3"
-                    width={1020}
-                />
+            <g transform={"rotate(180 500 300) translate(-20 320)"}>
+                <image href={shadow} opacity="0.4" width={1020} />
             </g>
-            <g
-                transform={"rotate(180 500 300) translate(0 360)"}
-            >
-                <image
-                    href="https://www.downloadclipart.net/large/ground-png-photos.png"
-                    width={1000}
-                />
+            <g transform={"rotate(180 500 300) translate(0 360)"}>
+                <image href={ground} width={1000} />
             </g>
         </g>
     )

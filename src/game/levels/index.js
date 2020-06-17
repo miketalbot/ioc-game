@@ -1,4 +1,4 @@
-import { handle, raise, stopPropagationAndExit } from "../../lib/event-bus"
+import { handle, raise } from "../../lib/event-bus"
 import "./level-definitions"
 import seedRandom from "seedrandom"
 import { configuredLevels } from "./level-definitions"
@@ -22,7 +22,7 @@ handle("newLevel", (levelNumber = currentLevel + 1) => {
         raise("levelReady", levelSpec)
     } else {
         let green = ((Math.random() * 8) | 0) + 4
-        let red = (Math.random() * 8) | (0 + (10 - green) + 2)
+        let red = ((Math.random() * 8) | 0) + (Math.max(3, 10 - green))
         const steps = (3 + Math.random() * 3) | 0
         let levelSpec = {
             levelNumber,

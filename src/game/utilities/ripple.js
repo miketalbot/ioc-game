@@ -47,7 +47,7 @@ const Ripple = React.forwardRef(function Ripple(props, ref) {
                 value.setAttribute("opacity", shownOpacity * _opacity)
                 value.setAttribute(
                     "transform",
-                    `translate(${x|0}, ${y|0}) scale(${_scale.toFixed(2)})`
+                    `translate(${x|0}, ${y|0}) scale(${_scale})`
                 )
             }
         }

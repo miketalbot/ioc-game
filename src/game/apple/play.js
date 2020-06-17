@@ -1,8 +1,7 @@
-import { handle, raise, raiseLater, using } from "../../lib/event-bus"
-import { getApple } from "./apple"
+import { handle, raiseLater, using } from "../../lib/event-bus"
+import { getApple, getTopApple } from "./apple"
 import { update } from "js-coroutines"
 import { clamp, ease, getVector, interpolate, Vector } from "../../lib/math"
-import { makeTopmost } from "../utilities/topmost"
 
 handle("prepareLevel", function ({ redApples = 0, greenApples = 0 }) {
     for (let i = 0; i < redApples; i++) {
@@ -63,7 +62,11 @@ function* moveApple(apple) {
         apple.rotate(false)
         if (mode === "collect") {
             apple.setDepth(-1)
-            let top = makeTopmost(apple)
+            let shadow = getTopApple()
+            if(shadow) {
+                shadow.color(apple.color())
+            }
+            yield
             let targetX = clamp(apple.x, 80, 920)
             let initialX = apple.x
             let initialY = apple.y
@@ -75,6 +78,7 @@ function* moveApple(apple) {
                 )
                 apple.setDepth(interpolate(0, -1.3, ease(t)))
                 apple.update()
+                shadow && apple.update(shadow.element)
                 yield
             }
             raiseLater("collect", apple)
@@ -83,10 +87,11 @@ function* moveApple(apple) {
             for (let t = 0; t < 1; t += 0.03) {
                 apple.move(apple.x, interpolate(40, -100, ease(t)))
                 apple.update()
+                shadow && apple.update(shadow.element)
                 yield
             }
 
-            top.return()
+            shadow && shadow.return()
         } else if (mode !== "cancel") {
             raiseLater("lost", apple)
         }

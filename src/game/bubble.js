@@ -2,24 +2,15 @@ import React from "react"
 import { update } from "js-coroutines"
 import bubble from "../assets/bubble.png"
 import { clamp, interpolate } from "../lib/math"
-import { handle, plug, raiseLater, useEvent, using } from "../lib/event-bus"
+import { handle, raiseLater, using } from "../lib/event-bus"
 import { Pool } from "../lib/pool"
-import {
-    Avatar,
-    Badge,
-    Card,
-    CardContent,
-    CardHeader,
-    CardMedia
-} from "@material-ui/core"
 
 let id = 0
 const Bubble = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
     const key = id++
     return (
-        <g opacity={1} ref={addRef} id={`bottle${key}`}>
+        <g opacity={1} ref={addRef} id={`bubble${key}`}>
             <image
-                alt="bubble"
                 href={bubble}
                 x={-125}
                 y={-125}
@@ -103,8 +94,8 @@ const Bubble = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
                 element.setAttribute("opacity", _opacity)
                 element.setAttribute(
                     "transform",
-                    `translate(${x|0},${y|0}) scale(${(_scale * scaleX).toFixed(8)} ${
-                        (_scale * scaleY).toFixed(8)
+                    `translate(${x|0},${y|0}) scale(${(_scale * scaleX)} ${
+                        (_scale * scaleY)
                     })`
                 )
             }
@@ -233,45 +224,3 @@ function* moveBubble(bubble) {
     })
 }
 
-plug("mission-item", ({ step }) => step && step.bubbles, BubbleItem)
-
-function BubbleItem({ step, index }) {
-    return (
-        <Card variant="outlined">
-            <CardHeader subheader={` `} />
-            <CardMedia
-                style={{ paddingTop: 60, backgroundSize: "contain" }}
-                image={bubble}
-            />
-            <CardContent>Pop {step.bubbles} bubbles</CardContent>
-        </Card>
-    )
-}
-
-plug(
-    "mission-indicator",
-    ({ item }) => item.bubbles !== undefined,
-    BubbleIndicator
-)
-
-function BubbleIndicator({ item, isCurrent, next, update }) {
-    useEvent("popped", handlePopped)
-    return (
-        <Badge
-            color="secondary"
-            invisible={!isCurrent}
-            badgeContent={item.bubbles}
-        >
-            <Avatar src={bubble} />
-        </Badge>
-    )
-    function handlePopped() {
-        if (isCurrent) {
-            item.bubbles--
-            update(Date.now())
-            if (item.bubbles <= 0) {
-                next()
-            }
-        }
-    }
-}

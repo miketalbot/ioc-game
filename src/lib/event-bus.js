@@ -24,13 +24,11 @@ export function stopPropagationAndExit() {
  *
  * @param {String} pattern - the event pattern to match
  * @param {Function} handler - the event handler
+ * @param {Number} [priority] - the priority for this handler, lower is better, default is 0
  */
-export function useEvent(pattern, handler) {
+export function useEvent(pattern, handler, priority) {
     React.useEffect(() => {
-        events.on(pattern, handler)
-        return function () {
-            events.off(pattern, handler)
-        }
+        return handle(pattern, handler, priority)
     })
 }
 
