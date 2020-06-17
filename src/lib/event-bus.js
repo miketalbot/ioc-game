@@ -1,13 +1,21 @@
 import PropTypes from "prop-types"
 import React from "react"
 import Emitter from "eventemitter2"
+import { inPriorityOrder } from "./sort"
+
+class Cancel extends Error {
+
+}
 
 const events = new Emitter({
     maxListeners: 0,
     ignoreErrors: true,
-    wildcard: true,
-    delimiter: "."
+    wildcard: false
 })
+
+export function stopPropagationAndExit() {
+    throw new Cancel()
+}
 
 /**
  * Applies an event handler safely ensuring that the
@@ -35,13 +43,30 @@ export function useEvent(pattern, handler) {
  *
  * @param {String} pattern - the event pattern to match
  * @param {Function} handler - the handler function for the event
+ * @param {Number} [priority] - the priority for this handler, lower is better, default is 0
  * @return {Function} a function to remove the event handler
  */
-export function handle(pattern, handler) {
+export function handle(pattern, handler, priority) {
+    handler.priority = priority
     events.on(pattern, handler)
+    events.listeners(pattern).sort(inPriorityOrder)
+
     return function () {
         events.off(pattern, handler)
     }
+}
+
+/**
+ * Raises an event on the event bus during the next free time
+ * @param {String} event - the event to raise
+ * @param  {...any} params - the parameters for the event
+ * @return {[any]} - the parameters passed to the function which
+ * is useful so that you can return values without initiailizing them
+ * @example
+ * const [list] = raise('addToThisList', []) // list will be the list passed to the event
+ */
+export function raiseLater(event, ...params) {
+    setTimeout(()=>raise(event, ...params))
 }
 
 /**
@@ -54,7 +79,14 @@ export function handle(pattern, handler) {
  * const [list] = raise('addToThisList', []) // list will be the list passed to the event
  */
 export function raise(event, ...params) {
-    events.emit(event, ...params)
+    try {
+        events.emit(event, ...params)
+    } catch(e) {
+        if(e instanceof Cancel) {
+            return params
+        }
+        throw e
+    }
     return params
 }
 
@@ -66,7 +98,14 @@ export function raise(event, ...params) {
  * @return {[any]} the parameters passed to the function
  */
 export async function raiseAsync(event, ...params) {
-    await events.emitAsync(event, ...params)
+    try {
+        await events.emitAsync(event, ...params)
+    } catch (e) {
+        if (e instanceof Cancel) {
+            return params
+        }
+        throw e
+    }
     return params
 }
 

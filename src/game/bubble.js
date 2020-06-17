@@ -2,15 +2,15 @@ import React from "react"
 import { update } from "js-coroutines"
 import bubble from "../assets/bubble.png"
 import { clamp, interpolate } from "../lib/math"
-import { raise, handle, using, plug, useEvent } from "../lib/event-bus"
+import { handle, plug, raiseLater, useEvent, using } from "../lib/event-bus"
 import { Pool } from "../lib/pool"
 import {
+    Avatar,
+    Badge,
     Card,
-    CardMedia,
     CardContent,
     CardHeader,
-    Avatar,
-    Badge
+    CardMedia
 } from "@material-ui/core"
 
 let id = 0
@@ -103,8 +103,8 @@ const Bubble = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
                 element.setAttribute("opacity", _opacity)
                 element.setAttribute(
                     "transform",
-                    `translate(${x},${y}) scale(${_scale * scaleX} ${
-                        _scale * scaleY
+                    `translate(${x|0},${y|0}) scale(${(_scale * scaleX).toFixed(8)} ${
+                        (_scale * scaleY).toFixed(8)
                     })`
                 )
             }
@@ -204,7 +204,7 @@ function* moveBubble(bubble) {
             yield
         } while (distanceToCursor > 25 && distanceFromStart < 140 && !stop)
         if (distanceToCursor <= 25) {
-            raise("popped", bubble)
+            raiseLater("popped", bubble)
             for (let opacity = 1; opacity >= 0; opacity -= 0.06) {
                 bubble.scale(bubble.scale() * 1.15)
                 bubble.opacity(opacity)

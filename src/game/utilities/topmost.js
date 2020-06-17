@@ -1,6 +1,6 @@
 import React from "react"
-import { handle } from "../lib/event-bus"
-import { Pool } from "../lib/pool"
+import { handle } from "../../lib/event-bus"
+import { Pool } from "../../lib/pool"
 
 const TopMost = React.forwardRef(function TopMost(props, ref) {
     return <use href="" ref={addRef} />

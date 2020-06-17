@@ -19,6 +19,5 @@ body {
 }
 
 .ontop {
-    z-index: 1000;
     position: absolute;
 }

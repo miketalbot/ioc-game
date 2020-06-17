@@ -1,7 +1,8 @@
 import React from "react"
-import { makeStyles, ThemeProvider, Box } from "@material-ui/core"
-import { floatText } from "./floating-text"
-const { handle, useEvent } = require("../lib/event-bus")
+import { Box, makeStyles } from "@material-ui/core"
+import { floatText } from "../utilities/floating-text"
+
+const { handle, useEvent } = require("../../lib/event-bus")
 
 let gameScore = 0
 handle("startGame", () => (gameScore = 0))

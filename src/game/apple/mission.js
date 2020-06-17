@@ -1,15 +1,8 @@
 import React from "react"
-import { plug, useEvent, raise } from "../../lib/event-bus"
-import {
-    Card,
-    CardHeader,
-    CardMedia,
-    Avatar,
-    Badge,
-    CardContent
-} from "@material-ui/core"
+import { plug, raise, raiseLater, useEvent } from "../../lib/event-bus"
+import { Avatar, Badge, Card, CardContent, CardHeader, CardMedia } from "@material-ui/core"
 import { apple1, apple2 } from "./apple"
-import { cascadeText, floatText } from "../floating-text"
+import { cascadeText } from "../utilities/floating-text"
 
 plug("mission-indicator", ({ item }) => item.red !== undefined, RedIndicator)
 plug(
@@ -37,7 +30,7 @@ function BonusIndicator({ isCurrent }) {
             speed: 300,
             scale: 4
         })
-        raise("score", { score: 1500, x: apple.x, y: apple.y })
+        raiseLater("score", { score: 1500, x: apple.x, y: apple.y })
     }
 }
 
@@ -65,7 +58,7 @@ function RedIndicator({ item, isCurrent, next, update }) {
             if (!item.red) {
                 next()
             }
-            raise("score", { score: 2500, x: apple.x, y: apple.y })
+            raiseLater("score", { score: 2500, x: apple.x, y: apple.y })
         } else {
             raise("error")
             cascadeText({
@@ -110,7 +103,7 @@ function GreenIndicator({ item, isCurrent, next, update }) {
                 speed: 300,
                 scale: 4
             })
-            raise("score", { score: 2500, x: apple.x, y: apple.y })
+            raiseLater("score", { score: 2500, x: apple.x, y: apple.y })
         } else {
             raise("error")
             cascadeText({

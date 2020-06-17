@@ -1,9 +1,8 @@
-import { using, handle, raise } from "../lib/event-bus"
-import { getApple } from "./apple/apple"
+import { handle, raise, raiseLater, using } from "../../lib/event-bus"
+import { getApple } from "./apple"
 import { update } from "js-coroutines"
-import { interpolate, clamp, Vector, getVector, ease } from "../lib/math"
-import { floatText } from "./floating-text"
-import { makeTopmost } from "./topmost"
+import { clamp, ease, getVector, interpolate, Vector } from "../../lib/math"
+import { makeTopmost } from "../utilities/topmost"
 
 handle("prepareLevel", function ({ redApples = 0, greenApples = 0 }) {
     for (let i = 0; i < redApples; i++) {
@@ -25,7 +24,7 @@ handle("prepareLevel", function ({ redApples = 0, greenApples = 0 }) {
 })
 
 handle("popped", function (bubble) {
-    raise("score", { score: 50, x: bubble.x, y: bubble.y })
+    raiseLater("score", { score: 50, x: bubble.x, y: bubble.y })
 })
 
 function* moveApple(apple) {
@@ -78,7 +77,7 @@ function* moveApple(apple) {
                 apple.update()
                 yield
             }
-            raise("collect", apple)
+            raiseLater("collect", apple)
             let now = Date.now()
             while (Date.now() - now < 1000) yield
             for (let t = 0; t < 1; t += 0.03) {
@@ -89,7 +88,7 @@ function* moveApple(apple) {
 
             top.return()
         } else if (mode !== "cancel") {
-            raise("lost", apple)
+            raiseLater("lost", apple)
         }
         apple.return()
 

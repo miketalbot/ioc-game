@@ -1,9 +1,9 @@
 import React from "react"
-import ripple from "../assets/wripple2.png"
-import { Pool } from "../lib/pool"
-import { handle } from "../lib/event-bus"
+import ripple from "../../assets/wripple2.png"
+import { Pool } from "../../lib/pool"
+import { handle } from "../../lib/event-bus"
 import { update } from "js-coroutines"
-import { interpolate } from "../lib/math"
+import { interpolate } from "../../lib/math"
 
 const Ripple = React.forwardRef(function Ripple(props, ref) {
     let x = -1000
@@ -47,7 +47,7 @@ const Ripple = React.forwardRef(function Ripple(props, ref) {
                 value.setAttribute("opacity", shownOpacity * _opacity)
                 value.setAttribute(
                     "transform",
-                    `translate(${x}, ${y}) scale(${_scale})`
+                    `translate(${x|0}, ${y|0}) scale(${_scale.toFixed(2)})`
                 )
             }
         }

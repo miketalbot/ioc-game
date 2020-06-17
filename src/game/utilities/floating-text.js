@@ -1,8 +1,8 @@
 import React from "react"
-import { Pool } from "../lib/pool"
-import { handle } from "../lib/event-bus"
+import { Pool } from "../../lib/pool"
+import { handle } from "../../lib/event-bus"
 import { update } from "js-coroutines"
-import { interpolate, Vector, ease } from "../lib/math"
+import { interpolate, Vector, ease } from "../../lib/math"
 
 const Text = React.forwardRef(function Text(props, ref) {
     let x = -1000
