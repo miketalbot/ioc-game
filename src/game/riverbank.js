@@ -23,7 +23,7 @@ export function RiverBank({ children }) {
             )}
             {children}
 
-            <g transform={"rotate(180 500 300) translate(-20 320)"}>
+            <g transform={"rotate(180 500 300) translate(-20 340)"}>
                 <image href={shadow} opacity="0.4" width={1020} />
             </g>
             <g transform={"rotate(180 500 300) translate(0 360)"}>

@@ -3,7 +3,7 @@ import { update } from "js-coroutines"
 import bottle from "../assets/bottle.png"
 import shadow from "../assets/bottle-shadow.png"
 import { clamp, interpolate } from "../lib/math"
-import { raise, handle, using, ensureArray, raiseLater } from "../lib/event-bus"
+import { ensureArray, handle, raise, raiseLater, using } from "../lib/event-bus"
 import { Pool } from "../lib/pool"
 
 let id = 0
@@ -11,12 +11,7 @@ const Bottle = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
     const key = id++
     return (
         <g opacity={1} ref={addRef} id={`bottle${key}`}>
-            <image
-                href={shadow}
-                x={10}
-                y={-90}
-                width={400}
-            />
+            <image href={shadow} x={10} y={-90} width={400} />
             <image href={bottle} x={0} y={-100} width={400} />
         </g>
     )
@@ -90,12 +85,12 @@ const Bottle = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
             if (!visible) {
                 element.setAttribute("transform", `translate(-100000,-100000)`)
             } else {
-                element.children[0].setAttribute("x", (15 - bobDepth * 3))
-                element.children[0].setAttribute("y", (-90 - bobDepth * 3))
-                element.children[0].setAttribute("width", (410 - bobDepth * 3))
+                element.children[0].setAttribute("x", 15 - bobDepth * 3)
+                element.children[0].setAttribute("y", -90 - bobDepth * 3)
+                element.children[0].setAttribute("width", 410 - bobDepth * 3)
                 element.setAttribute(
                     "transform",
-                    `translate(${x |0},${y|0}) scale(${interpolate(
+                    `translate(${x | 0},${y | 0}) scale(${interpolate(
                         1,
                         0.92,
                         clamp(bobDepth / 2)
@@ -103,6 +98,7 @@ const Bottle = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
                 )
             }
         }
+
         function show(newVisible) {
             visible = newVisible
         }
@@ -119,6 +115,30 @@ const bottles = new Pool(Bottle, 4)
 export function getBottle() {
     return bottles.get()
 }
+
+handle("initializeLevel", function (levelSpec) {
+    levelSpec.bottleFixed = []
+    let bottles = (2 + Math.random() * 3) | 0
+    let bottleStart = (Math.random() * 1100) | 0
+    for (let i = 0; i < bottles; i++) {
+        levelSpec.bottleFixed.push({
+            x: bottleStart,
+            y: 150 + Math.random() * 500,
+            speed: 0.25 + Math.random() / 9
+        })
+        bottleStart += (500 + Math.random() * 300) | 0
+    }
+})
+
+handle("getLevelAllocators", function (allocators, levelSpec) {
+    let bubble = 0
+    allocators.push(function (step) {
+        const amount = ((Math.random() * 5) | 0) * 5 + 10
+        if (bubble + amount > levelSpec.bottleFixed.length * 25) return false
+        bubble += amount
+        step.bubbles = amount
+    })
+})
 
 //Put apples in the game
 handle("initialize", function ({ game }) {
