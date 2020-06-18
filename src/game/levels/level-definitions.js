@@ -92,6 +92,11 @@ const configuredLevels = [
                 x: 300,
                 y: 200,
                 speed: 0.25
+            },
+            {
+                x: 2000,
+                y: 400,
+                speed: 0.5
             }
         ],
         mission: [{ green: 1 }, { bubbles: 70 }, { red: 1 }]
@@ -116,6 +121,6 @@ const configuredLevels = [
     }
 ]
 
-handle('get-levels', function (levels) {
+handle("get-levels", function (levels) {
     levels.push(...configuredLevels)
 })
