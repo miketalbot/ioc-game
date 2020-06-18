@@ -21,6 +21,7 @@ import "./game/levels/level-definitions"
 export default function App() {
     const [uiElements] = raise("ui", [])
     return (
+
         <div className="App">
             <GameSurface>{uiElements}</GameSurface>
         </div>
