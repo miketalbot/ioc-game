@@ -3,7 +3,7 @@ import "./styles.css"
 import { raise } from "./lib/event-bus"
 import { GameSurface } from "./game/game-surface"
 
-//Supports starting the game etc
+//Core requirements for the game / menus etc
 import "./game"
 
 //Plug ins
