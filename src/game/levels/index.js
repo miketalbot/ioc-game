@@ -1,5 +1,4 @@
 import { handle, raise } from "../../lib/event-bus"
-import seedRandom from "seedrandom"
 
 let currentLevel = 0
 
