@@ -46,7 +46,7 @@ export function MissionIntro() {
                         />
                         <CardContent>
                             {!!levelSpec.instructions && levelSpec.instructions}
-                            <Grid container spacing={1} justify="center">
+                            <Grid container spacing={2} justify="center">
                                 {levelSpec.mission.map((item, index) => (
                                     <Grid item key={index}>
                                         <Socket

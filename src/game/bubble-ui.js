@@ -12,7 +12,7 @@ import React from "react"
 
 export function BubbleItem({ step }) {
     return (
-        <Card variant="outlined">
+        <Card elevation={4}>
             <CardHeader subheader={` `} />
             <CardMedia
                 style={{ paddingTop: 60, backgroundSize: "contain" }}

@@ -1,7 +1,8 @@
 import React from "react"
 import { Box, Typography } from "@material-ui/core"
+import { handle } from "../../lib/event-bus"
 
-export const configuredLevels = [
+const configuredLevels = [
     {
         instructions: (
             <Box>
@@ -114,3 +115,7 @@ export const configuredLevels = [
         mission: [{ green: 3 }, { red: 1 }, { green: 3 }, { red: 1 }]
     }
 ]
+
+handle('get-levels', function (levels) {
+    levels.push(...configuredLevels)
+})

@@ -4,6 +4,7 @@ import bubble from "../assets/bubble.png"
 import { clamp, interpolate } from "../lib/math"
 import { handle, raiseLater, using } from "../lib/event-bus"
 import { Pool } from "../lib/pool"
+import './bubble-ui'
 
 let id = 0
 const Bubble = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {

@@ -1,6 +1,13 @@
 import React from "react"
-import { plug, raise, raiseLater, useEvent } from "../../lib/event-bus"
-import { Avatar, Badge, Card, CardContent, CardHeader, CardMedia } from "@material-ui/core"
+import { handle, plug, raise, raiseLater, useEvent } from "../../lib/event-bus"
+import {
+    Avatar,
+    Badge,
+    Card,
+    CardContent,
+    CardHeader,
+    CardMedia
+} from "@material-ui/core"
 import { apple1, apple2 } from "./apple"
 import { cascadeText } from "../utilities/floating-text"
 
@@ -124,7 +131,7 @@ plug("mission-item", ({ step }) => step && step.red, RedItem)
 
 function RedItem({ step, index }) {
     return (
-        <Card variant="outlined">
+        <Card elevation={4}>
             <CardHeader subheader={` `} />
             <CardMedia
                 style={{ paddingTop: 60, backgroundSize: "contain" }}
@@ -141,7 +148,7 @@ plug("mission-item", ({ step }) => step && step.green, GreenItem)
 
 function GreenItem({ step, index }) {
     return (
-        <Card variant="outlined">
+        <Card elevation={4}>
             <CardHeader subheader={` `} />
             <CardMedia
                 style={{ paddingTop: 60, backgroundSize: "contain" }}
@@ -153,3 +160,22 @@ function GreenItem({ step, index }) {
         </Card>
     )
 }
+
+handle("getLevelAllocators", function(allocators, levelSpec) {
+    allocators.push(allocate("red"))
+    allocators.push(allocate("green"))
+    function allocate(color) {
+        let total = levelSpec[`${color}Apples`]
+        return function(step) {
+            const amount = 1 + Math.random() * 4 | 0
+            if(amount > total) return false
+            total -= amount
+            step[color] = amount
+        }
+    }
+})
+
+handle("initializeLevel", function (levelSpec) {
+    levelSpec.redApples = 3 + ((Math.random() * 10) | 0)
+    levelSpec.greenApples = (20 - levelSpec.redApples + Math.random() * 5) | 0
+})
