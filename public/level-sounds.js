@@ -22,16 +22,18 @@ var heartBeat = new Howl({
     volume: 1
 })
 
-handle("timeRemaining", (time) => {
+handle("timeRemaining", time => {
     if (time === 10) {
         heartBeat.play()
     }
 })
 
-handle("nextLevel", function () {
+handle("nextLevel", function() {
+    heartBeat.stop()
     complete.play()
 })
 
-handle("gameOver", function () {
+handle("gameOver", function() {
+    heartBeat.stop()
     gameOver.play()
 })
