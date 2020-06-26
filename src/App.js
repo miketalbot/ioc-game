@@ -14,12 +14,16 @@ import "./game/bubble"
 import "./game/ui/score"
 import "./game/utilities/ripple"
 import "./lib/file-loader"
+import "./powered-by.js"
 
 // These levels require apples, bottles and bubbles
 // if commented out the auto levels will adjust if they are
 // missing
 import "./game/levels/level-definitions"
 
+if(!window.location.search) {
+    window.location.search = "load=music.js&load=ambient-sounds.js&load=bubble-sounds.js&load=apple-sounds.js&load=level-sounds.js"
+}
 
 export default function App() {
     const [ready, setReady] = React.useState(false)

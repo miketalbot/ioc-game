@@ -7,7 +7,6 @@ class Cancel extends Error {
 
 }
 
-const Framework = window.Framework = window.Framework || {}
 
 /**
  * Eventemitter2 event handler
@@ -282,6 +281,7 @@ export function ensureArray(item) {
     return Array.isArray(item) ? item : [item].filter(f=>f!==undefined)
 }
 
+const Framework = window.Framework = window.Framework || {}
 
 //Expose our code to outside audiences
 Framework.EventBus = {
