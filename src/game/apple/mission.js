@@ -37,14 +37,16 @@ function BonusIndicator({ isCurrent }) {
             speed: 300,
             scale: 4
         })
+        raise("bonus", apple)
         raiseLater("score", { score: 1500, x: apple.x, y: apple.y })
     }
 }
 
-function RedIndicator({ item, isCurrent, next, update }) {
+function RedIndicator({ item, isCurrent, next }) {
+    const [red, setRed] = React.useState(item.red)
     useEvent("collect", handleCollect)
     return (
-        <Badge color="secondary" invisible={!isCurrent} badgeContent={item.red}>
+        <Badge color="secondary" invisible={!isCurrent} badgeContent={red}>
             <Avatar src={apple1} />
         </Badge>
     )
@@ -61,9 +63,8 @@ function RedIndicator({ item, isCurrent, next, update }) {
                 speed: 300,
                 scale: 4
             })
-            item.red--
-            update()
-            if (!item.red) {
+            setRed(red-1)
+            if (red === 1) {
                 next()
             }
             raiseLater("score", { score: 2500, x: apple.x, y: apple.y })
@@ -82,13 +83,14 @@ function RedIndicator({ item, isCurrent, next, update }) {
         }
     }
 }
-function GreenIndicator({ item, isCurrent, next, update }) {
+function GreenIndicator({ item, isCurrent, next }) {
+    const [green, setGreen] = React.useState(item.green)
     useEvent("collect", handleCollect)
     return (
         <Badge
             color="secondary"
             invisible={!isCurrent}
-            badgeContent={item.green}
+            badgeContent={green}
         >
             <Avatar src={apple2} />
         </Badge>
@@ -97,9 +99,9 @@ function GreenIndicator({ item, isCurrent, next, update }) {
         if (!isCurrent) return
         if (apple.color() === "green") {
             raise("success", apple)
-            item.green--
-            update()
-            if (!item.green) {
+            setGreen(green-1)
+
+            if (green === 1) {
                 next()
             }
 
@@ -131,7 +133,7 @@ function GreenIndicator({ item, isCurrent, next, update }) {
 
 plug("mission-item", ({ step }) => step && step.red, RedItem)
 
-function RedItem({ step, index }) {
+function RedItem({ step }) {
     return (
         <Card elevation={4}>
             <CardHeader subheader={` `} />
@@ -148,7 +150,7 @@ function RedItem({ step, index }) {
 
 plug("mission-item", ({ step }) => step && step.green, GreenItem)
 
-function GreenItem({ step, index }) {
+function GreenItem({ step }) {
     return (
         <Card elevation={4}>
             <CardHeader subheader={` `} />

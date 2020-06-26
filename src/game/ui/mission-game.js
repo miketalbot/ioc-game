@@ -55,7 +55,7 @@ function Steps() {
     const [step, setStep] = React.useState(0)
 
     return mission.map((item, index) => (
-        <Item item={item} index={index} key={index} next={next} step={step}/>
+        <Item item={item} index={index} key={`${step} = ${index}`} next={next} step={step}/>
     ))
 
     function prepare({ mission }) {
@@ -131,6 +131,7 @@ function Time() {
 
     function reduceTime() {
         setTime((time) => time - 1)
+        raise("timeRemaining", time)
         if (time - 1 === 0) {
             raise("endLevel")
             raise("gameOver", "time")

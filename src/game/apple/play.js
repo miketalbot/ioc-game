@@ -104,8 +104,6 @@ function* moveApple(apple) {
             let toPlayerDistanceSq =
                 (apple.x - x + t * dx) ** 2 + (apple.y - y + t * dy) ** 2
 
-            // const toPlayer = getVector(x, y).sub(Vector.from(apple))
-            // const toPlayerDistanceSq = toPlayer.lengthSq()
             const playerMotion = getVector(dx, dy).scale(1 / 20)
             const angle = Vector.from(apple)
                 .sub(getVector(x, y))

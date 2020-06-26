@@ -7,12 +7,30 @@ class Cancel extends Error {
 
 }
 
-const events = new Emitter({
+const Framework = window.Framework = window.Framework || {}
+
+/**
+ * Eventemitter2 event handler
+ */
+export let events = new Emitter({
     maxListeners: 0,
     ignoreErrors: true,
     wildcard: false
 })
 
+/**
+ * Change the event source of the bus, useful
+ * for testing
+ * @param {Object} newSource - a source of events
+ */
+export function setEventSource(newSource) {
+    events = newSource
+}
+
+/**
+ * Immediately stop a chain of event handlers and
+ * exit
+ */
 export function stopPropagationAndExit() {
     throw new Cancel()
 }
@@ -50,6 +68,27 @@ export function handle(pattern, handler, priority) {
     events.listeners(pattern).sort(inPriorityOrder)
 
     return function () {
+        events.off(pattern, handler)
+    }
+}
+
+/**
+ * Add an event handler that will trigger only once
+ * @param {String} pattern - the event pattern to match
+ * @param {Function} handler - the handler function for the event
+ * @param {Number} [priority] - the priority for this handler, lower is better, default is 0
+ * @param {Number} [timeout] - a timeout for automatically removing the handler
+ * @returns {Function} a function to remove the handler
+ */
+export function once(pattern, handler, priority, timeout = 0) {
+    handler.priority = priority
+    events.once(pattern, handler)
+    events.listeners(pattern).sort(inPriorityOrder)
+    if(timeout) {
+        setTimeout(remove, timeout)
+    }
+    return remove
+    function remove() {
         events.off(pattern, handler)
     }
 }
@@ -149,7 +188,7 @@ export function Socket({ filter = returnValue, type, children, ...props }) {
         props
     )
     items = items.filter(Boolean)
-    items.sort((a, b) => (a.priority || 100) - (b.priority || 100))
+    items.sort(inPriorityOrder)
     raise(`ui-render-plugs.${type}`, items)
     return (
         <>
@@ -212,7 +251,7 @@ function returnValue(value) {
  * @param {Function} Component
  * @param {Number} [priority=100] The priority for the component
  */
-export function plug(type, predicate, Component, priority = 100) {
+export function plug(type, predicate, Component, priority = 0) {
     if (typeof Component === "number") {
         priority = Component
         Component = predicate
@@ -229,6 +268,33 @@ export function plug(type, predicate, Component, priority = 100) {
     })
 }
 
+/**
+ * Ensures that a passed in item is an array
+ * by wrapping it in an array if it isn't
+ * already one.  The array is filtered to ensure
+ * no empty values
+ * so passing undefined or null will end up with an
+ * empty array
+ * @param item
+ * @returns {Array} the wrapped array
+ */
 export function ensureArray(item) {
-    return Array.isArray(item) ? item : [item].filter(Boolean)
+    return Array.isArray(item) ? item : [item].filter(f=>f!==undefined)
 }
+
+
+//Expose our code to outside audiences
+Framework.EventBus = {
+    plug,
+    Socket,
+    raise,
+    raiseLater,
+    raiseAsync,
+    once,
+    handle,
+    useEvent,
+    events,
+    stopPropagationAndExit
+}
+
+Framework.React = React
