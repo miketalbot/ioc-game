@@ -110,13 +110,13 @@ const Bottle = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
     }
 })
 
-const bottles = new Pool(Bottle, 4)
+const bottles = new Pool(Bottle, 6)
 
 export function getBottle() {
     return bottles.get()
 }
 
-handle("initializeLevel", function (levelSpec) {
+handle("initializeLevel", function(levelSpec) {
     levelSpec.bottleFixed = []
     let bottles = (2 + Math.random() * 3) | 0
     let bottleStart = (Math.random() * 1100) | 0
@@ -130,9 +130,9 @@ handle("initializeLevel", function (levelSpec) {
     }
 })
 
-handle("getLevelAllocators", function (allocators, levelSpec) {
+handle("getLevelAllocators", function(allocators, levelSpec) {
     let bubble = 0
-    allocators.push(function (step) {
+    allocators.push(function(step) {
         const amount = ((Math.random() * 5) | 0) * 5 + 10
         if (bubble + amount > levelSpec.bottleFixed.length * 25) return false
         bubble += amount
@@ -141,12 +141,12 @@ handle("getLevelAllocators", function (allocators, levelSpec) {
 })
 
 //Put apples in the game
-handle("initialize", function ({ game }) {
+handle("initialize", function({ game }) {
     game.push(bottles.elements)
 })
 
 function* moveBottle(bottle, speed) {
-    yield* using(function* (on) {
+    yield* using(function*(on) {
         let stop = false
         on("endLevel", () => (stop = true))
         for (let x = bottle.x; !stop && x > -500; x -= speed) {

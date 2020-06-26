@@ -4,20 +4,14 @@ import bubble from "../assets/bubble.png"
 import { clamp, interpolate } from "../lib/math"
 import { handle, raiseLater, using } from "../lib/event-bus"
 import { Pool } from "../lib/pool"
-import './bubble-ui'
+import "./bubble-ui"
 
 let id = 0
 const Bubble = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
     const key = id++
     return (
         <g opacity={1} ref={addRef} id={`bubble${key}`}>
-            <image
-                href={bubble}
-                x={-125}
-                y={-125}
-                width={250}
-                opacity={0.8}
-            />
+            <image href={bubble} x={-125} y={-125} width={250} opacity={0.8} />
         </g>
     )
 
@@ -95,9 +89,8 @@ const Bubble = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
                 element.setAttribute("opacity", _opacity)
                 element.setAttribute(
                     "transform",
-                    `translate(${x|0},${y|0}) scale(${(_scale * scaleX)} ${
-                        (_scale * scaleY)
-                    })`
+                    `translate(${x | 0},${y | 0}) scale(${_scale *
+                        scaleX} ${_scale * scaleY})`
                 )
             }
         }
@@ -124,12 +117,12 @@ export function makeBubble(x, y, scale) {
 }
 
 //Put apples in the game
-handle("initialize", function ({ top }) {
+handle("initialize", function({ top }) {
     top.push(bubbles.elements)
 })
 
-handle("bob", function (bottle) {
-    if (bottle.x < 10 || bottle.x > 990) return
+handle("bob", function(bottle) {
+    if (bottle.x < -210 || bottle.x > 990) return
     for (let i = 0; i < Math.random() * 3; i++) {
         makeBubble(
             bottle.x + 20 + Math.random() * 5,
@@ -142,7 +135,7 @@ handle("bob", function (bottle) {
 const EFFECTIVE_DISTANCE = 130
 
 function* moveBubble(bubble) {
-    return yield* using(function* (on) {
+    return yield* using(function*(on) {
         on("player", updatePlayerPosition)
         on("endLevel", () => (stop = true))
         let distanceToCursor = Infinity
@@ -224,4 +217,3 @@ function* moveBubble(bubble) {
         }
     })
 }
-

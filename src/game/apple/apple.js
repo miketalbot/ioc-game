@@ -94,7 +94,7 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
             element._key = key
             element._gradient = Array.from(element.childNodes[0].children)
                 .slice(1, -1)
-                .map((node) => node.attributes.offset)
+                .map(node => node.attributes.offset)
 
             ref && ref(apple)
             updateSvgElement()
@@ -116,7 +116,7 @@ const Apple = React.forwardRef(function Apple({ x = 0, y = 0 }, ref) {
         }
 
         function updateSvgElement(updateElement = element) {
-            raise("circle", apple)
+            if (visible) raise("circle", apple)
             const effectiveDepth = bobDepth + depth
             rotationSpeed = interpolate(
                 rotationSpeed,
@@ -194,12 +194,11 @@ export function getTopApple() {
     return topApples.get()
 }
 
-
 //Put apples in the game
-handle("initialize", function ({ game, top  }) {
+handle("initialize", function({ game, top }) {
     game.push(apples.elements)
     top.push(topApples.elements)
-    setTimeout(()=>{
-        apples.forEach(apple=>apple.start())
+    setTimeout(() => {
+        apples.forEach(apple => apple.start())
     }, 50)
 })

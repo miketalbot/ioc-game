@@ -51,6 +51,7 @@ function RedIndicator({ item, isCurrent, next, update }) {
     function handleCollect(apple) {
         if (!isCurrent) return
         if (apple.color() === "red") {
+            raise("success", apple)
             cascadeText({
                 x: apple.x,
                 y: apple.y,
@@ -67,7 +68,7 @@ function RedIndicator({ item, isCurrent, next, update }) {
             }
             raiseLater("score", { score: 2500, x: apple.x, y: apple.y })
         } else {
-            raise("error")
+            raise("error", apple)
             cascadeText({
                 x: apple.x,
                 y: apple.y,
@@ -95,6 +96,7 @@ function GreenIndicator({ item, isCurrent, next, update }) {
     function handleCollect(apple) {
         if (!isCurrent) return
         if (apple.color() === "green") {
+            raise("success", apple)
             item.green--
             update()
             if (!item.green) {
@@ -112,7 +114,7 @@ function GreenIndicator({ item, isCurrent, next, update }) {
             })
             raiseLater("score", { score: 2500, x: apple.x, y: apple.y })
         } else {
-            raise("error")
+            raise("error", apple)
             cascadeText({
                 x: apple.x,
                 y: apple.y,
@@ -167,15 +169,15 @@ handle("getLevelAllocators", function(allocators, levelSpec) {
     function allocate(color) {
         let total = levelSpec[`${color}Apples`]
         return function(step) {
-            const amount = 1 + Math.random() * 4 | 0
-            if(amount > total) return false
+            const amount = (1 + Math.random() * 4) | 0
+            if (amount > total) return false
             total -= amount
             step[color] = amount
         }
     }
 })
 
-handle("initializeLevel", function (levelSpec) {
+handle("initializeLevel", function(levelSpec) {
     levelSpec.redApples = 3 + ((Math.random() * 10) | 0)
     levelSpec.greenApples = (20 - levelSpec.redApples + Math.random() * 5) | 0
 })
