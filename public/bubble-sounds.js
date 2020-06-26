@@ -6,6 +6,7 @@ var popIndex = 0
 var produce = new Howl({
     src:['zapsplat_cartoon_bubble_002_46660.mp3'],
     loop: false,
+    preload: true,
     volume: 0.1
 })
 
@@ -14,6 +15,7 @@ for(var i = 0; i < 10; i++) {
         src: ['zapsplat_cartoon_bubble_pop_005_40277.mp3'],
         loop: false,
         autoplay: false,
+        preload: true,
         volume: 0.7
     }))
 }

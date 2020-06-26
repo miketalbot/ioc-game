@@ -7,6 +7,7 @@ var rippleIndex = 0
 for (var i = 0; i < 20; i++) {
     ripples.push(
         new Howl({
+            preload: true,
             src: [
                 "zapsplat_sport_diving_stick_throw_into_swiming_pool_water_splash_11427.mp3"
             ],
