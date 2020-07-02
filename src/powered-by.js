@@ -27,7 +27,7 @@ function PoweredBy() {
     useEvent("endGame", () => setVisible(true))
     return (
         !!visible && (
-            <Box class={classes.logo}>
+            <Box className={classes.logo}>
                 <a
                     target="_blank"
                     rel="noopener noreferrer"
