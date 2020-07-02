@@ -1,3 +1,5 @@
+//GAME FOR THIS ARTICLE SERIES: https://dev.to/miketalbot/a-solid-framework-inversion-of-control-pt1-4jg
+
 import React from "react"
 import "./styles.css"
 import { raise, raiseAsync } from "./lib/event-bus"
